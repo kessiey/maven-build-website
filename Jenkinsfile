@@ -42,5 +42,17 @@ pipeline {
                 }
             }
         }
+
+        stage("Upload to Nexus") {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'earth-app', classifier: '', file: '/var/lib/jenkins/workspace/maven-build-website/target/earth-app-1.0-SNAPSHOT.war', type: 'war']], credentialsId: 'nexus-id', groupId: 'com.devops.maven', nexusUrl: '3.145.216.253:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-build-website-snapshot', version: '1.0-SNAPSHOT'
+            }
+        }
+
+        stage("Deploy to UAT") {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', path: '', url: 'http://3.135.209.206:8080')], contextPath: null, war: 'target/*.war'
+            }
+        }
     }
 }
